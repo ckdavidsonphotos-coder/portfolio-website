@@ -3,7 +3,7 @@
    ============================================================ */
 
 const SITE = {
-  name: "Your Name",
+  name: "Connor K Davidson",
   bio: "Photographer based in London, working on personal projects and commissions for magazines and cultural clients.",
   email: "hello@yourname.com",
   instagram: "https://instagram.com/yourhandle"
@@ -20,8 +20,11 @@ const SITE = {
    {t:"Long Walk Home", g:"Personal", slug:"long-walk-home",
     files:["01.jpg","02.jpg","03.jpg"]}
 */
+/* Builds ["01.jpg","02.jpg", ... ] so you do not have to type each name */
+const seq = (count, ext="jpg") => Array.from({length:count}, (_,i)=>String(i+1).padStart(2,"0")+"."+ext);
+
 const PROJECTS = [
-  {t:"Project One", g:"Personal", slug:"project-one", files:[], n:12},
+  {t:"Project One", g:"Personal", slug:"project-one", files:seq(31)},
   {t:"Project Two", g:"Personal", slug:"project-two", files:[], n:18},
   {t:"Project Three", g:"Personal", slug:"project-three", files:[], n:9},
   {t:"Magazine Feature, Publication", g:"Commissioned", slug:"magazine-feature", files:[], n:16},

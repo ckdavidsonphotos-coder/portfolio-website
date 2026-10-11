@@ -1,5 +1,4 @@
-:root{--bg:#fff;--fg:#000;--mute:#8c8c8c;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root{--bg:#000;--fg:#f2f2f2;--mute:#777}}
+:root{--bg:#fff;--fg:#000;--mute:#8c8c8c;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
 body{background:var(--bg);color:var(--fg);font:400 13px/1.45 "Hanken Grotesk","Helvetica Neue",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
