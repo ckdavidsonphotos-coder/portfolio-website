@@ -9,25 +9,25 @@ const SITE = {
   instagram: "https://instagram.com/yourhandle"
 };
 
-/* One entry per project.
+/* One entry per project. Photos are found automatically.
    t     = title shown on the site
-   g     = "Personal" or "Commissioned" (these are the two home page panels)
+   g     = "Personal" or "Commissioned" (the two home page sections)
    slug  = folder name inside /images  (lowercase, no spaces)
-   files = photo filenames in that folder, in the order you want them shown
-   n     = only used while files is empty, to show grey placeholder tiles
+   n     = only used for grey placeholders if NO photos are found anywhere
 
-   Example once you have photos:
-   {t:"Long Walk Home", g:"Personal", slug:"long-walk-home",
-    files:["01.jpg","02.jpg","03.jpg"]}
+   The site looks in each folder for 01.jpg up to SCAN.jpg and shows whatever exists.
+   Projects with no photos are hidden. To force a specific order or names instead,
+   add files:["a.jpg","b.jpg"] to a project.
 */
+const SCAN = 31;   // highest photo number to look for
 /* Builds ["01.jpg","02.jpg", ... ] so you do not have to type each name */
 const seq = (count, ext="jpg") => Array.from({length:count}, (_,i)=>String(i+1).padStart(2,"0")+"."+ext);
 
 const PROJECTS = [
-  {t:"Project One", g:"Personal", slug:"project-one", files:seq(31)},
-  {t:"Project Two", g:"Personal", slug:"project-two", files:[], n:18},
-  {t:"Project Three", g:"Personal", slug:"project-three", files:[], n:9},
-  {t:"Magazine Feature, Publication", g:"Commissioned", slug:"magazine-feature", files:[], n:16},
-  {t:"Portrait Series, Publication", g:"Commissioned", slug:"portrait-series", files:[], n:14},
-  {t:"Editorial Story, Publication", g:"Commissioned", slug:"editorial-story", files:[], n:20}
+  {t:"Project One", g:"Personal", slug:"project-one", n:12},
+  {t:"Project Two", g:"Personal", slug:"project-two", n:18},
+  {t:"Project Three", g:"Personal", slug:"project-three", n:9},
+  {t:"Magazine Feature, Publication", g:"Commissioned", slug:"magazine-feature", n:16},
+  {t:"Portrait Series, Publication", g:"Commissioned", slug:"portrait-series", n:14},
+  {t:"Editorial Story, Publication", g:"Commissioned", slug:"editorial-story", n:20}
 ];

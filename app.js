@@ -1,6 +1,6 @@
 const $ = s=>document.querySelector(s), view=$("#view"), ov=$("#overlay");
 const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
-const groups=["Personal","Commissioned"];
+let LIST=[], groups=[];
 const RN=[1.333,.75,.75,1.5,.75,1.333];
 let timers=[], key=null;
 const clear=()=>{timers.forEach(clearInterval);timers=[];key=null};
@@ -18,7 +18,7 @@ function projectTiles(p,idx){
 
 function homeTiles(g,gi){
   const urls=[];
-  PROJECTS.filter(p=>p.g===g).forEach(p=>p.files.slice(0,3).forEach(f=>urls.push([src(p,f),p.t])));
+  LIST.filter(p=>p.g===g).forEach(p=>p.files.slice(0,3).forEach(f=>urls.push([src(p,f),p.t])));
   return urls.length
     ? urls.slice(0,8).map(([u,t],i)=>photo(u,t,!i)).join("")
     : Array.from({length:6},(_,i)=>block(i,gi*3+1,!i)).join("");
@@ -26,22 +26,22 @@ function homeTiles(g,gi){
 
 function home(){
   clear(); ov.classList.remove("open");
-  view.innerHTML=`<div class="home">`+groups.map((g,gi)=>`
+  view.innerHTML=`<div class="home" style="--cols:${groups.length}">`+groups.map((g,gi)=>`
     <div class="panel" data-g="${g}" tabindex="0" role="link" aria-label="Open ${g} projects">
       <div class="stage">${homeTiles(g,gi)}</div>
-      <div class="label"><span>${g}</span><span class="mute">${PROJECTS.filter(p=>p.g===g).length} projects</span></div>
+      <div class="label"><span>${g}</span><span class="mute">${LIST.filter(p=>p.g===g).length} projects</span></div>
     </div>`).join("")+`</div>`;
   view.querySelectorAll(".panel").forEach((p,pi)=>{
     const imgs=[...p.querySelectorAll(".ph")];let k=0;
     if(!still&&imgs.length>1)timers.push(setInterval(()=>{imgs[k].classList.remove("on");k=(k+1)%imgs.length;imgs[k].classList.add("on")},1200+pi*250));
-    const go=()=>project(PROJECTS.findIndex(x=>x.g===p.dataset.g));
+    const go=()=>project(LIST.findIndex(x=>x.g===p.dataset.g));
     p.onclick=go; p.onkeydown=e=>{if(e.key==="Enter")go()};
   });
 }
 
 function project(i){
   clear(); ov.classList.remove("open");
-  const p=PROJECTS[i]; let k=0;
+  const p=LIST[i]; let k=0;
   view.innerHTML=`<div class="solo" id="solo">
     <div class="stage">${projectTiles(p,i)}</div>
     <div class="label"><span>${p.t}</span><span class="mute" id="ct"></span></div></div>`;
@@ -60,7 +60,7 @@ function info(){
 
 function index(){
   ov.innerHTML=`<div class="top"><span>${SITE.name}</span><button id="close">Close</button></div>`+
-    groups.map(g=>`<h4>${g}</h4><ul>`+PROJECTS.map((p,i)=>p.g===g?`<li><button data-i="${i}">${p.t}<sup>${count(p)}</sup></button></li>`:"").join("")+`</ul>`).join("");
+    groups.map(g=>`<h4>${g}</h4><ul>`+LIST.map((p,i)=>p.g===g?`<li><button data-i="${i}">${p.t}<sup>${count(p)}</sup></button></li>`:"").join("")+`</ul>`).join("");
   ov.classList.add("open");
   $("#close").onclick=()=>ov.classList.remove("open");
   ov.querySelectorAll("li button").forEach(b=>b.onclick=()=>project(+b.dataset.i));
@@ -72,4 +72,19 @@ document.addEventListener("keydown",e=>{
   if(e.key==="Escape")ov.classList.remove("open");
   if(key&&!ov.classList.contains("open"))key(e);
 });
-home();
+/* Find which photos exist in each folder (HEAD requests, no photos downloaded) */
+const exists = async u => { try { return (await fetch(u,{method:"HEAD"})).ok } catch { return false } };
+async function discover(p){
+  if(p.files && p.files.length) return;
+  const names=seq(SCAN);
+  const ok=await Promise.all(names.map(f=>exists(src(p,f))));
+  p.files=names.filter((_,i)=>ok[i]);
+}
+(async()=>{
+  view.innerHTML="";
+  await Promise.all(PROJECTS.map(discover));
+  const found=PROJECTS.filter(p=>p.files.length);
+  LIST = found.length ? found : PROJECTS;           // placeholders if nothing uploaded yet
+  groups = ["Personal","Commissioned"].filter(g=>LIST.some(p=>p.g===g));
+  home();
+})();
